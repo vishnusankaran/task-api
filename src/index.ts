@@ -1,28 +1,48 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import { cors } from 'hono/cors';
+import { buildSchema } from 'drizzle-graphql';
+import { createYoga } from 'graphql-yoga';
 
-import { eq } from 'drizzle-orm';
+import { db } from './db/index.ts';
 
-import { db, profile } from './schema/index.ts'
+const { schema } = buildSchema(db);
 
-const app = new Hono()
+const yoga = createYoga({
+  schema,
+  graphqlEndpoint: '/graphql',
+});
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const app = new Hono();
 
-app.get('/user/:id', async (c) => {
-  const id = c.req.param('id')
+app.use(
+  '*',
+  cors({
+    origin: (process.env.ALLOWED_ORIGINS || '')?.split(','),
+    allowMethods: ['POST', 'GET', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    maxAge: 6000,
+  })
+);
 
-  const [userProfile] = await db.select().from(profile).where(eq(profile.id, id)).execute();
+app.use('/graphql', async (c) => {
+  const ctx = Object.prototype.hasOwnProperty.call(c, 'executionCtx')
+    ? c.executionCtx
+    : {};
+  const request = new Request(c.req.url, {
+    method: c.req.method,
+    headers: c.req.raw.headers,
+    body: c.req.raw.body,
+  });
+  return yoga.handleRequest(request, {
+    env: c.env,
+    ctx,
+  });
+});
 
-  return c.json(userProfile)
-})
-
-const port = 3000
-console.log(`Server is running on http://localhost:${port}`)
+const port = 4000;
+console.log(`Server is running on http://localhost:${port}`);
 
 serve({
   fetch: app.fetch,
-  port
-})
+  port,
+});

@@ -1,0 +1,2 @@
+ALTER TABLE "task" ALTER COLUMN "user" SET DEFAULT '{"id":"asdfghjkl","name":"Vishnu Sankaran","avatar":"https://avatars.githubusercontent.com/u/4065909?v=4","email":"vishnu88sankaran@gmail.com"}'::jsonb;--> statement-breakpoint
+ALTER TABLE "task" ALTER COLUMN "user" DROP NOT NULL;

@@ -2,18 +2,22 @@
   "name": "starter-node-hono-postgres",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "pnpm run db:generate-sql && pnpm run db:sql-update && tsx watch src/index.ts",
     "db:schema-update": "drizzle-kit push",
     "db:generate-sql": "drizzle-kit generate",
     "db:sql-update": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@apollo/server": "^4.11.3",
     "@hono/node-server": "^1.13.7",
     "dotenv": "^16.4.7",
+    "drizzle-graphql": "^0.8.5",
     "drizzle-orm": "^0.38.4",
+    "graphql": "^16.10.0",
+    "graphql-yoga": "^5.13.0",
     "hono": "^4.6.17",
-    "pg": "^8.13.1"
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
