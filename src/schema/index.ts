@@ -16,4 +16,6 @@ export const task = pgTable('task', {
     avatar: 'https://avatars.githubusercontent.com/u/4065909?v=4',
     email: 'vishnu88sankaran@gmail.com',
   }),
+  importance: text('importance'),
+  urgency: text('urgency'),
 });
